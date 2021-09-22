@@ -1,0 +1,207 @@
+\documentclass{beamer}	% Compile at least twice!
+%\setbeamertemplate{navigation symbols}{}
+\usetheme{Warsaw}
+%\useinnertheme{rectangles}
+%\useoutertheme{infolines}
+\useoutertheme[title,section,subsection=true]{smoothbars}
+ 
+% -------------------
+% Packages
+% -------------------
+\usepackage{
+	amsmath,			% Math Environments
+	amssymb,			% Extended Symbols
+	enumerate,		    % Enumerate Environments
+	graphicx,			% Include Images
+	lastpage,			% Reference Lastpage
+	multicol,			% Use Multi-columns
+	multirow,			% Use Multi-rows
+	pifont,			    % For Checkmarks
+	stmaryrd			% For brackets
+}
+\usepackage[english]{babel}
+
+
+% -------------------
+% Colors
+% -------------------
+\definecolor{UniOrange}{RGB}{212,69,0}
+\definecolor{UniGray}{RGB}{62,61,60}
+%\definecolor{UniRed}{HTML}{B31B1B}
+%\definecolor{UniGray}{HTML}{222222}
+\setbeamercolor{title}{fg=UniGray}
+\setbeamercolor{frametitle}{fg=UniOrange}
+\setbeamercolor{structure}{fg=UniOrange}
+\setbeamercolor{section in head/foot}{bg=UniGray}
+\setbeamercolor{author in head/foot}{bg=UniGray}
+\setbeamercolor{date in head/foot}{fg=UniGray}
+\setbeamercolor{structure}{fg=UniOrange}
+\setbeamercolor{local structure}{fg=black}
+\beamersetuncovermixins{\opaqueness<1>{0}}{\opaqueness<2->{15}}
+
+
+% -------------------
+% Fonts & Layout
+% -------------------
+\useinnertheme{default}
+\usefonttheme{serif}
+\usepackage{palatino}
+\setbeamerfont{title like}{shape=\scshape}
+\setbeamerfont{frametitle}{shape=\scshape}
+\setbeamertemplate{itemize items}[circle]
+%\setbeamertemplate{enumerate items}[default]
+
+
+% -------------------
+% Commands
+% -------------------
+
+% Special Characters
+\newcommand{\N}{\mathbb{N}}
+\newcommand{\Z}{\mathbb{Z}}
+\newcommand{\Q}{\mathbb{Q}}
+\newcommand{\R}{\mathbb{R}}
+\newcommand{\C}{\mathbb{C}}
+
+% Math Operators
+\DeclareMathOperator{\im}{im}
+\DeclareMathOperator{\Span}{span}
+
+% Special Commands
+\newcommand{\pf}{\noindent\emph{Proof. }}
+\newcommand{\ds}{\displaystyle}
+\newcommand{\defeq}{\stackrel{\text{def}}{=}}
+\newcommand{\ov}[1]{\overline{#1}}
+\newcommand{\ma}[1]{\stackrel{#1}{\longrightarrow}}
+\newcommand{\twomatrix}[4]{\begin{pmatrix} #1 & #2 \\ #3 & #4 \end{pmatrix}}
+
+\def\fig#1#2{\begin{figure}[htbp]
+		\centering
+		\includegraphics[width=0.8\textwidth]{#1.png}
+		\caption{#2}
+		\end{figure}}
+
+% -------------------
+% Tikz & PGF
+% -------------------
+\usepackage{tikz}
+\usepackage{tikz-cd}
+\usetikzlibrary{
+	calc,
+	decorations.pathmorphing,
+	matrix,arrows,
+	positioning,
+	shapes.geometric
+}
+\usepackage{pgfplots}
+\pgfplotsset{compat=newest}
+
+
+% -------------------
+% Theorem Environments
+% -------------------
+\theoremstyle{plain}
+\newtheorem{thm}{Theorem}[section]
+\newtheorem{prop}{Proposition}[section]
+\newtheorem{lem}{Lemma}[section]
+\newtheorem{cor}{Corollary}[section]
+\theoremstyle{definition}
+\newtheorem{ex}{Example}[section]
+\newtheorem{nex}{Non-Example}[section]
+\newtheorem{dfn}{Definition}[section]
+\theoremstyle{remark}
+\newtheorem{rem}{Remark}[section] 
+\numberwithin{equation}{section}
+
+
+% -------------------
+% Title Page
+% -------------------
+\title{\textcolor{white}{Brain information flow}}
+\subtitle{\textcolor{white}{-Technical note}}  
+\author{Leopold}
+\date{\today} 
+
+
+% -------------------
+% Content
+% -------------------
+\begin{document}
+
+% Title Page
+\begin{frame}
+\titlepage
+\end{frame}
+
+
+
+\section{Background}
+\subsection{diffusion map}
+
+
+\begin{frame}
+	\textbf{Diffusion maps} exploits the charactersistic of random walk Markov chain. The basic observation is that if we take a random walk on the data, walking to a nearby data-point is more likely than walking to another that is far away.
+	
+	\hspace{0.5cm}
+\begin{columns}
+	\column{0.6\textwidth}
+	Given a dataset $ \mathbf{X} $, Define the probality of walking $ x $ to $ y $ in one step as:\\
+	$ k(x, y) = exp(-\dfrac{||x-y||^2}{\epsilon}) $
+	\begin{itemize}
+		\item $ k(x, y)=k(y, x) $
+		\item $ k(x, y) \geq 0 $
+		\item captures the local geometry
+		
+	\end{itemize}
+	
+	\column{0.4\textwidth}
+	markov chain
+	$d(x)=\int_{\mathbf{X}}k(x, y)d\mu(y)$\\
+	and define:
+	$p(x, y)=\dfrac{k(x, y)}{d(x)}$\\
+	not symmetric but positivity-preserving property\\
+	$\int_{\mathbf{X}}p(x, y)d\mu(y)=1$
+	
+	
+\end{columns}
+\end{frame}
+
+
+\begin{frame}
+\textbf{Diffusion pmrocess}\\
+Define the diffusion matirx $L: \quad L_{i, j}=k(x_i, x_j)$, a version of graph laplacian matrix. \\
+New kernel:
+\[ L_{i, j}^{\alpha}=k^(\alpha)(x_i, x_j)=\dfrac{L_{i, j}}{\left(d(x_i)d(x_j)\right)^{\alpha}} \]
+or equivalently, $L(\alpha) = D^{-\alpha}LD^{-\alpha}$. After graph Laplacian normalization, we get transition matrix $M$.
+\[ p(x_j , t| x_i) = M_{i, j}^t \]
+The eigendecomposition of the matrix $ M ^t$ yields
+\[ M_{i, j}^t = \sum_{l} \lambda_{l}^t \psi_{l}(x_i)\phi_{l}(x_j) \]
+\end{frame}
+
+\begin{frame}
+	\textbf{Diffusion distance}\\
+	The diffusion distance at time $ t $:
+	\[ D_t(x_i, x_j)^2 = \sum_{y} \dfrac{\left(p(y, t|x_i)-p(y, t|x_j)^2\right)}{\Phi_{0}(y)}\]
+	where $ \phi_{0}(y) $ is stationary distribution of the markov chain, given by the first left eigenvector of $ M $:
+	\[ \phi_{0}(y) = \dfrac{d(y)}{\sum_{z \in \mathbf{X}} d(z)} \]
+\end{frame}
+
+\begin{frame}
+	\textbf{low dimension embedding}\\
+	the eigenvectors can be used as a new set of coordinates, then the original data can be embedded into
+	$$
+	\Psi_{t}(x)=\left(\lambda_{1}^{t} \psi_{1}(x), \lambda_{2}^{t} \psi_{2}(x), \ldots, \lambda_{k}^{t} \psi_{k}(x)\right)
+	$$
+	\\
+	The above diffusion distance is equal to Euclidean distance in the diffusion coordinates
+	\begin{equation*}
+		\begin{aligned}
+			D_{t}\left(x_{i}, x_{j}\right)^{2}=\left\|\Psi_{t}\left(x_{i}\right)-\Psi_{t}\left(x_{j}\right)\right\|^{2}\\
+		= \sum_{l} \lambda_{l}^{2 t}\left(\psi_{l}\left(x_{i}\right)-\psi_{l}\left(x_{j}\right)\right)^{2}
+		\end{aligned}
+	\end{equation*}
+
+	
+\end{frame}
+
+\end{document}
