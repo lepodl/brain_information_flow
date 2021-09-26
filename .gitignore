@@ -137,4 +137,4 @@ dmypy.json
 /technical_note/*.toc
 
 /.idea
-/data/raw_data
+/data/
