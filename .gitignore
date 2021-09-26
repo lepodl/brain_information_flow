@@ -128,13 +128,9 @@ dmypy.json
 # Pyre type checker
 .pyre/
 
-/technical_note/*.aux
-/technical_note/*.log
-/technical_note/*.nav
-/technical_note/*.out
-/technical_note/*.snm
-/technical_note/*.gz
-/technical_note/*.toc
 
 /.idea
 /data/
+/technical_note/diffusion_map/*
+!/technical_note/diffusion_map/*.pdf
+!/technical_note/diffusion_map/*.tex
